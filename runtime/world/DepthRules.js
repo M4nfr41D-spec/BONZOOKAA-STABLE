@@ -7,6 +7,9 @@
 // Depth is the single progression axis. It drives difficulty and unlocks
 // new modifier rules at milestones. Active modifiers per zone are sampled
 // from the unlocked pool (weighted), so no run is the same.
+//
+// Copyright (c) Manfred Foissner. All rights reserved.
+// License: See LICENSE.txt in the project root.
 
 import { State } from '../State.js';
 

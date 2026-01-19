@@ -527,8 +527,8 @@ export const World = {
     const camX = Camera.getX();
     const camY = Camera.getY();
     
-    // Layer 2: Nebula wisps
-    if (parallax.foreground?.objects) {
+        // Layer 2: Nebula wisps
+    if (parallax.foreground.objects) {
       const fgOffsetX = camX * parallax.foreground.scrollSpeed;
       const fgOffsetY = camY * parallax.foreground.scrollSpeed;
       
@@ -545,7 +545,7 @@ export const World = {
       
       ctx.globalAlpha = 1;
     }
-  },
+  }
 
   drawParallax(ctx, screenW, screenH) {
     // Back-compat: some callers still use drawParallax()
