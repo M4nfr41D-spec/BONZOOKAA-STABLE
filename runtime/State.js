@@ -133,6 +133,8 @@ export const State = {
     // Interaction (portals, terminals, etc.)
     interact: false,
     interactPressed: false,
+    // Hub return shortcut
+    hub: false,
     shift: false,
     mouseX: 0,
     mouseY: 0
