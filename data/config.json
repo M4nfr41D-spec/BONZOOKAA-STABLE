@@ -1,6 +1,7 @@
 {
-  "version": "2.2.0",
+  "version": "2.4.0",
   "name": "BONZOOKAA!",
+  
   "player": {
     "baseHP": 100,
     "baseDamage": 6,
@@ -16,13 +17,29 @@
     "shieldRegenRate": 5,
     "shieldRegenDelay": 3
   },
+  
   "progression": {
     "baseXP": 100,
-    "xpScale": 1.15,
+    "linearXP": 25,
+    "quadraticXP": 5,
     "maxLevel": 0,
     "skillPerLevel": 1,
-    "statPerLevel": 3
+    "statPerLevel": 3,
+    "hpPerLevel": 5,
+    "damagePerLevel": 0.02
   },
+  
+  "difficulty": {
+    "depthHPScale": 0.06,
+    "depthHPExponent": 1.3,
+    "depthDamageScale": 0.04,
+    "depthDamageExponent": 1.2,
+    "depthSpeedScale": 0.01,
+    "depthSpeedCap": 0.5,
+    "depthXPScale": 0.03,
+    "depthDropScale": 0.01
+  },
+  
   "waves": {
     "vendorInterval": 5,
     "vendorStart": 3,
@@ -36,21 +53,83 @@
     "eliteHPMult": 2.5,
     "bossHPMult": 8
   },
+  
   "economy": {
     "scrapPerKill": 5,
     "cellsPerKill": 3,
     "bossScrapMult": 10,
     "eliteScrapMult": 3
   },
+  
   "loot": {
-    "baseDropChance": 0.05,
+    "baseDropChance": 0.025,
+    "eliteDropChance": 0.15,
     "bossDropChance": 1.0,
-    "eliteDropChance": 0.3
+    "bossGuaranteedRarity": "rare",
+    
+    "depthBonus": {
+      "enabled": true,
+      "perDepth": 0.001,
+      "cap": 0.05
+    },
+    
+    "rarityFloorByDepth": {
+      "enabled": true,
+      "thresholds": {
+        "50": "uncommon",
+        "100": "rare",
+        "200": "epic"
+      }
+    },
+    
+    "pity": {
+      "enabled": true,
+      "thresholds": {
+        "rare": 15,
+        "epic": 100,
+        "legendary": 500
+      }
+    },
+    
+    "multiDropChance": {
+      "elite": 0.10,
+      "boss": 0.25
+    },
+    
+    "killStreakBonus": {
+      "enabled": true,
+      "thresholds": [10, 25, 50, 100],
+      "dropBonus": [1.1, 1.25, 1.5, 2.0],
+      "rarityBonus": [0, 0.05, 0.10, 0.20],
+      "decayTime": 3.0
+    }
   },
+  
+  "itemLevel": {
+    "enabled": true,
+    "baseByAct": {
+      "act1": 11,
+      "act2": 21,
+      "act3": 31
+    },
+    "perDepthBonus": 0.4,
+    "perZoneBonus": 0.5,
+    
+    "affixTierGating": {
+      "T5": 1,
+      "T4": 15,
+      "T3": 30,
+      "T2": 50,
+      "T1": 70,
+      "T0": 90
+    }
+  },
+  
   "stash": {
     "baseSlots": 56,
     "maxSlots": 200
   },
+  
   "effects": {
     "damageNumbers": {
       "baseSize": 16,
@@ -69,6 +148,7 @@
       "bossIntensity": 10
     }
   },
+  
   "exploration": {
     "bossEveryNZones": 10,
     "mapScale": 5.0,
@@ -89,6 +169,7 @@
     "maxDecorationsPerZone": 4000,
     "maxObstaclesPerZone": 1500
   },
+  
   "asteroids": {
     "enabled": true,
     "maxPerZone": 30,
@@ -104,6 +185,7 @@
     "minNearSpawn": 6,
     "nearSpawnRadius": 1400
   },
+  
   "background": {
     "enabled": true,
     "tileScale": 1.0,
