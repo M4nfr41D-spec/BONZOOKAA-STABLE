@@ -20,6 +20,9 @@ import { Particles } from './runtime/Particles.js';
 import { Input } from './runtime/Input.js';
 import { UI } from './runtime/UI.js';
 
+// Audio System
+import { Audio } from './runtime/Audio.js';
+
 // World System
 import { Camera } from './runtime/world/Camera.js';
 import { World } from './runtime/world/World.js';
@@ -70,7 +73,7 @@ const Game = {
     State.modules = {
       Save, Stats, Leveling, Items, Player, 
       Enemies, Bullets, Pickups, Particles, UI,
-      Camera, World, SceneManager
+      Camera, World, SceneManager, Audio
     };
     
     // Initialize systems
@@ -78,6 +81,7 @@ const Game = {
     UI.init();
     Camera.init(0, 0);
     SceneManager.init();
+    Audio.init();  // Initialize audio system
     
     // Calculate stats
     Stats.calculate();
@@ -405,6 +409,15 @@ const Game = {
     this.hideModal('startModal');
     this.showModal('hubModal');
     this.renderHubUI();
+    
+    // Play hub music
+    Audio.playMusic?.('hub');
+  },
+  
+  // Called by START RUN button on startModal
+  start() {
+    console.log('🎮 Starting game from start modal...');
+    this.showHub();
   },
   
   renderHubUI() {
@@ -473,6 +486,9 @@ const Game = {
     
     // Start the act via SceneManager
     SceneManager.startAct(actId, seed);
+    
+    // Play combat music
+    Audio.playMusic?.('combat');
     
     // Announce
     const actName = State.data.acts?.[actId]?.name || actId;
