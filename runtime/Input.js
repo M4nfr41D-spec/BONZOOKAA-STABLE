@@ -74,6 +74,12 @@ export const Input = {
       case 'ShiftRight':
         input.shift = true;
         break;
+      case 'Escape':
+        // Toggle pause
+        if (window.Game?.togglePause) {
+          window.Game.togglePause();
+        }
+        break;
     }
   },
   

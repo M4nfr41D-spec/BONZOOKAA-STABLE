@@ -15,7 +15,23 @@ export const Player = {
   update(dt, canvas, explorationMode = false) {
     const p = State.player;
     const cfg = State.data.config?.player || {};
-    // ========== CORRUPTION DOT ==========
+    // ========== CORRUPTION DOT (v0) ==========
+    if (p.dotT && p.dotT > 0) {
+      p.dotT -= dt;
+      this.takeDamage(p.maxHP * (p.dotPct || 0) * dt);
+      if (p.dotT <= 0) { p.dotT = 0; p.dotPct = 0; }
+    }
+
+
+    // ========== CORRUPTION DOT (v0) ==========
+    if (p.dotT && p.dotT > 0) {
+      p.dotT -= dt;
+      this.takeDamage(p.maxHP * (p.dotPct || 0) * dt);
+      if (p.dotT <= 0) { p.dotT = 0; p.dotPct = 0; }
+    }
+
+
+    // ========== CORRUPTION DOT (v0) ==========
     if (p.dotT && p.dotT > 0) {
       p.dotT -= dt;
       this.takeDamage(p.maxHP * (p.dotPct || 0) * dt);
