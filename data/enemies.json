@@ -141,7 +141,7 @@
     "sentinel": {
       "name": "Sentinel Alpha",
       "icon": "ðŸ‘‘",
-      "hp": 800,
+      "hp": 200,
       "damage": 25,
       "speed": 35,
       "score": 500,
