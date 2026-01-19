@@ -22,6 +22,9 @@ export const World = {
   despawnRadius: 1200,   // Distance to despawn (performance)
   activeEnemies: [],     // Currently active enemies from spawns
   
+  // Portal interaction state
+  nearPortal: null,      // Currently nearby portal (for UI prompt)
+  
   // Initialize world with act config
   async init(actId, seed = null) {
     // Load act config
@@ -166,11 +169,24 @@ export const World = {
       }
     }
     
-    // Check portal collision
+    // Check portal collision - require E key to enter
+    this.nearPortal = null;
     for (const portal of this.currentZone.portals) {
       const dist = Math.hypot(player.x - portal.x, player.y - portal.y);
-      if (dist < 60) {
-        this.onPortalEnter(portal);
+      if (dist < 75) {
+        this.nearPortal = portal;
+        // E key = Enter portal
+        if (State.input.interactPressed) {
+          State.input.interactPressed = false;
+          this.onPortalEnter(portal);
+          return;
+        }
+        // H key = Return to Hub (shortcut)
+        if (State.input.hub) {
+          State.input.hub = false;
+          this.returnToHub();
+          return;
+        }
       }
     }
     
@@ -299,16 +315,29 @@ export const World = {
     }
   },
   
-  // Boss killed - spawn portal
+  // Boss killed - spawn TWO portals (Hub + Next Zone)
   onBossKilled() {
-    State.ui?.showAnnouncement?.('âœ¨ PORTAL OPENED!');
+    State.ui?.showAnnouncement?.('✨ BOSS DEFEATED! PORTALS OPENED!');
     
-    // Spawn portal to hub
+    const zoneW = this.currentZone.width;
+    const zoneH = this.currentZone.height;
+    
+    // Victory portal (Hub) - left
     this.currentZone.portals.push({
-      x: this.currentZone.width / 2,
-      y: this.currentZone.height / 2,
+      x: zoneW / 2 - 100,
+      y: zoneH / 2,
       destination: 'hub',
-      type: 'victory'
+      type: 'victory',
+      label: 'RETURN TO HUB [H]'
+    });
+    
+    // Continue portal (Next Zone) - right
+    this.currentZone.portals.push({
+      x: zoneW / 2 + 100,
+      y: zoneH / 2,
+      destination: 'next',
+      type: 'continue',
+      label: 'NEXT ZONE [E]'
     });
   },
   
@@ -318,12 +347,25 @@ export const World = {
     this.loadZone(nextZone);
   },
   
-  // Player entered portal
+  // Return to hub (via H key or hub portal)
+  returnToHub() {
+    State.scene = 'hub';
+    State.run.inCombat = false;
+    State.modules.SceneManager?.goToHub?.();
+    State.ui?.renderHub?.();
+  },
+  
+  // Player entered portal (via E key)
   onPortalEnter(portal) {
     if (portal.destination === 'hub') {
-      // Transition to hub
-      State.scene = 'hub';
-      State.ui?.renderHub?.();
+      this.returnToHub();
+    } else if (portal.destination === 'next') {
+      // Continue to next zone
+      const nextZone = this.zoneIndex + 1;
+      this.loadZone(nextZone);
+      if (window.Game?.announce) {
+        window.Game.announce(`📍 ZONE ${nextZone + 1}`, 'zone');
+      }
     } else if (portal.destination) {
       // Load specific act/zone
       this.init(portal.destination);
@@ -453,21 +495,43 @@ export const World = {
       ctx.fillText('EXIT', exit.x, exit.y + 5);
     }
     
-    // Draw portals
+    // Draw portals with interaction prompt
     for (const portal of this.currentZone.portals) {
       const pulse = Math.sin(Date.now() / 200) * 0.3 + 0.7;
-      ctx.fillStyle = portal.type === 'victory' ? '#ffdd00' : '#8800ff';
-      ctx.shadowColor = ctx.fillStyle;
-      ctx.shadowBlur = 30 * pulse;
+      const isNear = (this.nearPortal === portal);
+      
+      // Portal color based on type
+      let portalColor = '#8800ff';
+      if (portal.type === 'victory') portalColor = '#ffdd00';
+      if (portal.type === 'continue') portalColor = '#00ff88';
+      
+      // Glow effect (brighter when near)
+      ctx.fillStyle = portalColor;
+      ctx.shadowColor = portalColor;
+      ctx.shadowBlur = isNear ? 50 * pulse : 30 * pulse;
       ctx.beginPath();
-      ctx.arc(portal.x, portal.y, 40 * pulse, 0, Math.PI * 2);
+      ctx.arc(portal.x, portal.y, (isNear ? 50 : 40) * pulse, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
       
+      // Portal label
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 12px Orbitron';
       ctx.textAlign = 'center';
-      ctx.fillText('PORTAL', portal.x, portal.y + 5);
+      ctx.fillText(portal.label || 'PORTAL', portal.x, portal.y + 5);
+      
+      // Interaction prompt when near
+      if (isNear) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px Orbitron';
+        if (portal.destination === 'next') {
+          ctx.fillText('[E] Enter', portal.x, portal.y + 65);
+        } else if (portal.destination === 'hub') {
+          ctx.fillText('[E] or [H]', portal.x, portal.y + 65);
+        } else {
+          ctx.fillText('[E] Enter', portal.x, portal.y + 65);
+        }
+      }
     }
   },
   
@@ -518,6 +582,7 @@ export const World = {
     }
     
     ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1;
   },
 
   drawParallaxForeground(ctx, screenW, screenH) {
@@ -545,7 +610,7 @@ export const World = {
       
       ctx.globalAlpha = 1;
     }
-  }
+  },
 
   drawParallax(ctx, screenW, screenH) {
     // Back-compat: some callers still use drawParallax()
